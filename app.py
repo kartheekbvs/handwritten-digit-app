@@ -30,7 +30,13 @@ def load_all_models():
         return
     try:
         print("Loading models...")
-        cnn_extractor = load_model(os.path.join(MODEL_DIR, 'cnn_feature_extractor.h5'))
+        cnn_path = os.path.join(MODEL_DIR, 'cnn_feature_extractor.h5')
+        if not os.path.exists(cnn_path):
+            print("Models not found! Training them now so predictions can work...")
+            import train
+            train.train_pipeline()
+
+        cnn_extractor = load_model(cnn_path)
         pca_transformer = joblib.load(os.path.join(MODEL_DIR, 'pca_transformer.pkl'))
         lr_model = joblib.load(os.path.join(MODEL_DIR, 'lr_model.pkl'))
         print("All models loaded successfully!")

@@ -8,7 +8,7 @@ import numpy as np
 
 # Set up parameters
 os.makedirs('models', exist_ok=True)
-epochs = 5
+epochs = 1
 batch_size = 64
 
 def load_and_preprocess_data():
