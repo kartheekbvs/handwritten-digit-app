@@ -1,10 +1,19 @@
 import os
-import tensorflow as tf
-from tensorflow.keras import layers, models
-from sklearn.decomposition import PCA
-from sklearn.linear_model import LogisticRegression
 import joblib
-import numpy as np
+
+try:
+    import tensorflow as tf
+    from tensorflow.keras import layers, models
+    from sklearn.decomposition import PCA
+    from sklearn.linear_model import LogisticRegression
+    # Set up parameters
+    os.makedirs('models', exist_ok=True)
+    epochs = 1
+    batch_size = 64
+except ImportError:
+    print("TensorFlow not installed. Skipping training as models are pre-trained for Render.")
+    import sys
+    sys.exit(0)
 
 # Set up parameters
 os.makedirs('models', exist_ok=True)
