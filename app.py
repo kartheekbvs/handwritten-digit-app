@@ -16,13 +16,18 @@ pca_transformer = None
 lr_model = None
 
 try:
-    import tensorflow as tf
-    from tensorflow.keras.models import load_model
+    import tflite_runtime.interpreter as tflite
     import joblib
     HAS_ML_DEPS = True
 except ImportError:
-    HAS_ML_DEPS = False
-    print("WARNING: ML dependencies (tensorflow, joblib) not installed. Models cannot be loaded.")
+    try:
+        import tensorflow as tf
+        tflite = tf.lite
+        import joblib
+        HAS_ML_DEPS = True
+    except ImportError:
+        HAS_ML_DEPS = False
+        print("WARNING: ML dependencies not installed. Models cannot be loaded.")
 
 def load_all_models():
     global cnn_extractor, pca_transformer, lr_model
@@ -30,8 +35,9 @@ def load_all_models():
         return
     try:
         print("Loading models...")
-        cnn_path = os.path.join(MODEL_DIR, 'cnn_feature_extractor.h5')
-        cnn_extractor = load_model(cnn_path)
+        cnn_path = os.path.join(MODEL_DIR, 'cnn_feature_extractor.tflite')
+        cnn_extractor = tflite.Interpreter(model_path=cnn_path)
+        cnn_extractor.allocate_tensors()
         pca_transformer = joblib.load(os.path.join(MODEL_DIR, 'pca_transformer.pkl'))
         lr_model = joblib.load(os.path.join(MODEL_DIR, 'lr_model.pkl'))
         print("All models loaded successfully!")
@@ -91,7 +97,12 @@ def predict():
         img_array = preprocess_image(data['image'])
         
         # 2. Extract features with CNN
-        cnn_features = cnn_extractor.predict(img_array, verbose=0)
+        input_details = cnn_extractor.get_input_details()
+        output_details = cnn_extractor.get_output_details()
+        
+        cnn_extractor.set_tensor(input_details[0]['index'], img_array)
+        cnn_extractor.invoke()
+        cnn_features = cnn_extractor.get_tensor(output_details[0]['index'])
         
         # 3. Reduce dimensions with PCA
         pca_features = pca_transformer.transform(cnn_features)
