@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handwritten Image Classifier</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="3" width="18" height="18" rx="4" stroke="#000" stroke-width="2" />
+                    <path d="M8 12L11 15L16 9" stroke="#000" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+                <h1>Handwritten Digit Classifier</h1>
+            </div>
+            <p class="subtitle">Draw a digit (0-9) to see the ML pipeline (CNN &rarr; PCA &rarr; LR) in action via Flask
+                Backend.</p>
+        </header>
+
+        <main class="main-content">
+            <!-- Left Panel: Drawing Area -->
+            <section class="panel input-panel">
+                <div class="panel-header">
+                    <h2>Canvas Input</h2>
+                    <span class="badge">28x28 Scale</span>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="drawingCanvas" width="280" height="280"></canvas>
+                </div>
+                <div class="controls">
+                    <button id="clearBtn" class="btn btn-secondary">Clear</button>
+                    <button id="predictBtn" class="btn btn-primary">
+                        <span>Predict</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Middle/Right Panel: Pipeline & Output -->
+            <section class="panel pipeline-panel">
+                <div class="panel-header">
+                    <h2>Processing Pipeline</h2>
+                </div>
+
+                <div class="pipeline-flow">
+                    <!-- CNN Stage -->
+                    <div class="pipeline-step" id="step-cnn">
+                        <div class="step-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                <rect x="7" y="7" width="3" height="3" />
+                                <rect x="14" y="7" width="3" height="3" />
+                                <rect x="7" y="14" width="3" height="3" />
+                                <rect x="14" y="14" width="3" height="3" />
+                            </svg>
+                        </div>
+                        <div class="step-details">
+                            <h3>CNN Feature Extraction</h3>
+                            <p>Extracting high-level features like edges and curves.</p>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="connector line"></div>
+
+                    <!-- PCA Stage -->
+                    <div class="pipeline-step" id="step-pca">
+                        <div class="step-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 3L3 21" />
+                                <path d="M21 21L3 3" />
+                                <path d="M12 2L12 22" />
+                                <path d="M2 12L22 12" />
+                            </svg>
+                        </div>
+                        <div class="step-details">
+                            <h3>PCA Dimensionality Reduction</h3>
+                            <p>Reducing sparse feature maps to principal components.</p>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="connector line"></div>
+
+                    <!-- Logistic Regression Stage -->
+                    <div class="pipeline-step" id="step-lr">
+                        <div class="step-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="18" y1="20" x2="18" y2="10" />
+                                <line x1="12" y1="20" x2="12" y2="4" />
+                                <line x1="6" y1="20" x2="6" y2="14" />
+                            </svg>
+                        </div>
+                        <div class="step-details">
+                            <h3>Logistic Regression</h3>
+                            <p>Classifying PCA components into class probabilities.</p>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-container" id="result-container">
+                    <div class="prediction-header">
+                        <h3>Prediction Output</h3>
+                        <div class="predicted-digit" id="predicted-digit">-</div>
+                    </div>
+
+                    <div class="confidence-list" id="confidence-list">
+                        <!-- Bars populated by JS -->
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <p>Built with Flask + TensorFlow Backend &bull; Minimalist white clean aesthetic.</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>
